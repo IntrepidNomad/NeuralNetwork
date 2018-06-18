@@ -455,37 +455,3 @@ with tf.Session(config=config) as sess:
         if loss_val < best_loss_val:
             save_path = saver.save(sess, checkpoint_path)
             best_loss_val = loss_val
-                           mask_with_labels: True})
-            print("\rIteration: {}/{} ({:.1f}%)  Loss: {:.5f}".format(
-                      iteration, n_iterations_per_epoch,
-                      iteration * 100 / n_iterations_per_epoch,
-                      loss_train),
-                  end="")
-        # At the end of each epoch,
-        # measure the validation loss and accuracy:
-        loss_vals = []
-        acc_vals = []
-        for iteration in range(1, n_iterations_validation + 1):
-            X_batch = imagearray_validation[(iteration-1)*batch_size:iteration*batch_size]
-            y_batch  = labels_validation[(iteration-1)*batch_size:iteration*batch_size]
-            loss_val, acc_val, prediction, real = sess.run(
-                    [loss, accuracy,y_pred,y],
-                    feed_dict={X: X_batch.reshape([-1, im_x, im_y, num_channels]),
-                               y: y_batch})
-            loss_vals.append(loss_val)
-            acc_vals.append(acc_val)
-            print(prediction, real)
-            print("\rEvaluating the model: {}/{} ({:.1f}%)".format(
-                      iteration, n_iterations_validation,
-                      iteration * 100 / n_iterations_validation),
-                  end=" " * 10)
-        loss_val = np.mean(loss_vals)
-        acc_val = np.mean(acc_vals)
-        print("\rEpoch: {}  Val accuracy: {:.4f}%  Loss: {:.6f}{}".format(
-            epoch + 1, acc_val * 100, loss_val,
-            " (improved)" if loss_val < best_loss_val else ""))
-
-        # And save the model if it improved:
-        if loss_val < best_loss_val:
-            save_path = saver.save(sess, checkpoint_path)
-            best_loss_val = loss_val
